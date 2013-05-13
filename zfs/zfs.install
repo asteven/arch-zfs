@@ -1,0 +1,55 @@
+_name=zfs
+
+# arg 1:  the new package version
+post_install() {
+   dkms add $_name/${1%-*} > /dev/null
+   cat << EOF
+==> To build and install your modules run: dkms install $_name/${1%-*}
+==> To do this automatically at startup run: systemctl enable dkms.service
+EOF
+   check_initramfs || cat << EOF
+==> To re-build modules automatically when a new kernel is installed add '$_name'
+    to the HOOKs array in /etc/mkinitcpio.conf hook _before_ the 'filesystems'
+    hook and make sure you have installed the header files for your kernel.
+EOF
+}
+
+# arg 1:  the new package version
+# arg 2:  the old package version
+pre_upgrade() {
+   pre_remove "$2"
+}
+
+# arg 1:  the new package version
+# arg 2:  the old package version
+post_upgrade() {
+   post_install "$1"
+   check_initramfs || true
+}
+
+# arg 1:  the old package version
+pre_remove() {
+   # Remove modules using dkms
+   [ -n "${1%-*}" ] && dkms remove $_name/${1%-*} --all >/dev/null || true
+}
+
+post_remove() {
+    check_initramfs 'remove' || true
+}
+
+check_initramfs() {
+   if grep -v '#' /etc/mkinitcpio.conf | grep -w -q $_name; then
+      if [[ $1 == 'remove' ]]; then
+         cat << EOF-check_initramfs
+==> The $_name package has been removed, but '$_name' remains in the 'HOOKS'
+    list in /etc/mkinitcpio.conf! You will need to remove '$_name' from the
+    'HOOKS' list and then regenerate the initial ramdisk.
+EOF-check_initramfs
+      else
+         echo "==> Found '$_name' in /etc/mkinitcpio.conf:HOOKS, regenerating initial ramdisk."
+         mkinitcpio -p linux
+      fi
+      return 0
+   fi    
+   return 1
+}

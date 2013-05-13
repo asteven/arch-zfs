@@ -1,0 +1,28 @@
+#!/bin/bash
+
+_build_modules() {
+    local _dkms_name="$1"
+    local _version=$(pacman -Q $_dkms_name | sed 's/^[^ ]* \|-[0-9]*$//g;2d')
+    echo "==> Building $_dkms_name modules for ${KERNELVERSION} kernel."
+    set -e
+    dkms install $_dkms_name/$_version -k ${KERNELVERSION}/_arch > /dev/null 2>&1
+}
+
+build() {
+   _build_modules spl
+
+   add_module spl
+   add_module splat
+
+   add_binary splat
+
+   [[ -f /etc/hostid ]] && add_file /etc/hostid
+}
+
+help() {
+   cat << HELPEOF
+This hook rebuilds spl odules and adds them to the initramfs.
+HELPEOF
+}
+
+# vim:set ts=4 sw=4 ft=sh

@@ -1,0 +1,50 @@
+# Maintainer: Steven Armstrong <steven-aur at armstrong.cc>
+
+pkgname='spl'
+pkgver=0.6.1
+pkgrel=1
+pkgdesc='Kernel module and support files for the Solaris Porting Layer (SPL).'
+arch=('i686' 'x86_64')
+url='http://zfsonlinux.org'
+license=('GPL')
+makedepends=('linux-headers' 'dkms' 'mkinitcpio')
+optdepends=('linux-headers: automatic kernel module rebuilding'
+            'linux-lts-headers: automatic kernel module rebuilding')
+provides=("$pkgname-modules")
+install="$pkgname.install"
+source=("http://archive.zfsonlinux.org/downloads/zfsonlinux/$pkgname/$pkgname-$pkgver.tar.gz"
+      "$pkgname.hostid"
+      "$pkgname.initcpio.install")
+md5sums=('0f58806d9fd9cab900181b59b21bae50'
+         'a54f0041a9e15b050f25c463f1db7449'
+         '983eddb0057344ac4549e66e693fda18')
+
+build() {
+   cd "$srcdir/$pkgname-$pkgver"
+   ./autogen.sh
+   ./configure --prefix=/usr \
+               --libdir=/usr/lib \
+               --sbindir=/usr/sbin \
+               --with-config=user
+   #FIXME: where to get /etc/default/spl whithout having to maintain it myself?
+   ./scripts/dkms.mkconf -n $pkgname -v $pkgver -c /etc/default/$pkgname -f dkms.conf
+   make
+}
+
+package() {
+   cd "$srcdir/$pkgname-$pkgver"
+   make DESTDIR=$pkgdir install
+
+   install -D -m 644 "$srcdir/$pkgname.hostid" $pkgdir/etc/hostid
+
+   # cleanup source tree, then copy it to /usr/src for later use by dkms
+   make distclean > /dev/null
+   install -d -m 755 "$pkgdir/usr/src"
+   cp -r "$srcdir/$pkgname-$pkgver" "$pkgdir/usr/src/$pkgname-$pkgver"
+
+   # install the mkinitcpio hook to compile the modules
+   cd "$srcdir"
+   sed -i "s|_arch|$CARCH|" "$pkgname.initcpio.install"
+   install -d -m 755 "$pkgdir/usr/lib/initcpio/install"
+   install -m 644 $pkgname.initcpio.install "$pkgdir/usr/lib/initcpio/install/$pkgname"
+}

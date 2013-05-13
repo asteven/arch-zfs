@@ -1,0 +1,101 @@
+#!/bin/bash
+
+_build_add_spl_modules() {
+    # build and add the spl modules if this is not done by the spl hook itself
+    if ! grep -v '#' /etc/mkinitcpio.conf | grep -w -q spl; then
+        _build_modules spl
+
+        add_module spl
+        add_module splat
+
+        add_binary splat
+
+        [[ -f /etc/hostid ]] && add_file /etc/hostid
+    fi
+}
+
+_build_modules() {
+    local _dkms_name="$1"
+    local _version=$(pacman -Q $_dkms_name | sed 's/^[^ ]* \|-[0-9]*$//g;2d')
+    echo "==> Building $_dkms_name modules for ${KERNELVERSION} kernel."
+    set -e
+    dkms install $_dkms_name/$_version -k ${KERNELVERSION}/_arch > /dev/null 2>&1
+}
+
+build() {
+    _build_add_spl_modules
+    _build_modules zfs
+
+    map add_module \
+        zavl \
+        znvpair \
+        zunicode \
+        zcommon \
+        zfs \
+        zpios \
+        zlib_deflate
+
+    map add_binary \
+        fsck.zfs \
+        zdb \
+        zfs \
+        zhack \
+        zinject \
+        zpios \
+        zpool \
+        zstreamdump \
+        ztest \
+        hostid \
+        mount.zfs \
+        /lib/udev/vdev_id \
+        /lib/udev/zvol_id
+
+    map add_file \
+        /lib/udev/rules.d/60-zvol.rules \
+        /lib/udev/rules.d/69-vdev.rules \
+        /lib/udev/rules.d/90-zfs.rules
+
+    add_runscript
+
+    # allow mount(8) to "autodetect" ZFS
+    echo 'zfs' >>"$BUILDROOT/etc/filesystems"
+
+    [[ -f /etc/zfs/zpool.cache ]] && add_file "/etc/zfs/zpool.cache"
+}
+
+help() {
+    cat<<HELPEOF
+This hook rebuilds the ZFS modules and adds them to the initramfs.
+It also allows you to use ZFS as your root filesystem.
+
+Command Line Setup:
+
+You can append the following arguments to your kernel parameters list. See
+https://wiki.archlinux.org/index.php/Kernel_parameters for more information.
+
+To use ZFS as your boot filesystem:
+
+    zfs=bootfs or zfs=auto or root=zfs
+
+To use a pool or dataset:
+
+    zfs=<pool/dataset>
+
+To force importing of a ZFS pool:
+
+    zfs_force=1
+
+    If set to 1, this will use "zpool import -f" when attempting to import
+    pools.
+
+Examples:
+
+To use bootfs on your pool, use
+
+    zfs=bootfs
+
+This will setup your root using tank/root zfs pool.
+
+    zfs=tank/root
+HELPEOF
+}

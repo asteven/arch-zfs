@@ -8,3 +8,7 @@
 *.pkg.tar.xz.sig
 *.[xgb]z
 *.bz2
+
+# Package and source directories
+*pkg/
+*src/

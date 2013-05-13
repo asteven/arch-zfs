@@ -1,0 +1,10 @@
+# Build logs
+*-build.log
+*-namcap.log
+*-package.log
+
+# Package sources, sigs, and packages themselves
+*.pkg.tar.xz
+*.pkg.tar.xz.sig
+*.[xgb]z
+*.bz2

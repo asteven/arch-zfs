@@ -21,8 +21,8 @@ source=("http://archive.zfsonlinux.org/downloads/zfsonlinux/$pkgname/$pkgname-$p
       "$pkgname.service")
 md5sums=('822cd73c139d89369d6c3944f8afe659'
          '3e1c4a29c4f7d590e6a3041f2c61d6ff'
-         'e3b91b9dbcca7be58249d7cd1eba2aeb'
-         '37067e0970143e5f89c86af0a25e4408'
+         'c9b8587a143561d24e359dda3ab858ef'
+         'ea5f8b842dad9fea9ce7a85da4f56dc0'
          '161e6a5f5f314c9308b4a4565c01fe45')
 
 build() {

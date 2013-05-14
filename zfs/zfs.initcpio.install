@@ -65,8 +65,8 @@ build() {
 
 help() {
     cat<<HELPEOF
-This hook rebuilds the ZFS modules and adds them to the initramfs.
-It also allows you to use ZFS as your root filesystem.
+This hook builds the ZFS modules against your current kernel and adds them to
+the initramfs. It also allows you to use ZFS as your root filesystem.
 
 Command Line Setup:
 

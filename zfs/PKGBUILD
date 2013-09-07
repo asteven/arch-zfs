@@ -1,7 +1,7 @@
 # Maintainer: Steven Armstrong <steven-aur at armstrong.cc>
 
 pkgname='zfs'
-pkgver=0.6.1
+pkgver=0.6.2
 pkgrel=1
 pkgdesc='Kernel module and support files for the Zettabyte File System.'
 arch=('i686' 'x86_64')
@@ -19,7 +19,7 @@ source=("http://archive.zfsonlinux.org/downloads/zfsonlinux/$pkgname/$pkgname-$p
       "$pkgname.initcpio.install"
       "$pkgname.initcpio.hook"
       "$pkgname.service")
-md5sums=('822cd73c139d89369d6c3944f8afe659'
+md5sums=('0b183b0abdd5be287046ad9ce4f899fd'
          '3e1c4a29c4f7d590e6a3041f2c61d6ff'
          'c9b8587a143561d24e359dda3ab858ef'
          'ea5f8b842dad9fea9ce7a85da4f56dc0'

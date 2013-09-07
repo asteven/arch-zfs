@@ -21,7 +21,7 @@ build() {
 
 help() {
    cat << HELPEOF
-This hook rebuilds spl odules and adds them to the initramfs.
+This hook rebuilds spl modules and adds them to the initramfs.
 HELPEOF
 }
 

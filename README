@@ -1,0 +1,14 @@
+## how to version bump
+old_version=0.6.1
+new_version=0.6.2
+
+for p in spl zfs; do
+   cd ./$p
+   git tag $old_version
+   sed -i "s|^\(pkgver=\)$old_version|\\1$new_version|" PKGBUILD
+   updpkgsums
+   makepkg -f --sign
+   git add PKGBUILD
+   cd ../
+done
+git cs -m "update to version $new_version"

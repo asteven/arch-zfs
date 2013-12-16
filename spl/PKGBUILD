@@ -17,8 +17,9 @@ source=("http://archive.zfsonlinux.org/downloads/zfsonlinux/$pkgname/$pkgname-$p
       "$pkgname.hostid"
       "$pkgname.initcpio.install")
 md5sums=('f00535bf89a7fde0e08f44a14a1f1e03'
+         '4d30dbda61995e77c5ca976abb80bad6'
          'a54f0041a9e15b050f25c463f1db7449'
-         '983eddb0057344ac4549e66e693fda18')
+         '11911b41ebcd002f5a18f1cfe184b806')
 
 prepare() {
     cd "$srcdir/spl-0.6.2"
